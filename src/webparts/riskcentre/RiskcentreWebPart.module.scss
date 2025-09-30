@@ -1,0 +1,339 @@
+.riskcentre {
+  padding: 20px;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  
+  .header {
+    margin-bottom: 30px;
+    
+    h2 {
+      color: #323130;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+    
+    p {
+      color: #605e5c;
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+
+  .spinnerContainer {
+    text-align: center;
+    padding: 40px;
+    
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #f3f2f1;
+      border-top: 4px solid #0078d4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    
+    p {
+      color: #605e5c;
+      font-size: 14px;
+    }
+  }
+
+  .errorMessage {
+    background-color: #fde7e9;
+    border: 1px solid #d13438;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    color: #d13438;
+    font-size: 14px;
+  }
+
+  .warningMessage {
+    background-color: #fff4ce;
+    border: 1px solid #ffb900;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    color: #8a6d3b;
+    font-size: 14px;
+  }
+
+  .tableHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 20px;
+    
+    .tableHeaderLeft {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      
+      h3 {
+        color: #323130;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .buttonGroup {
+        display: flex;
+        gap: 8px;
+      }
+    }
+    
+    .tableHeaderRight {
+      flex-shrink: 0;
+    }
+  }
+
+  .fileTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+    
+    thead {
+      background-color: #f3f2f1;
+      
+      th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #323130;
+        font-size: 14px;
+        border-bottom: 2px solid #d2d0ce;
+      }
+    }
+    
+    tbody {
+      tr {
+        border-bottom: 1px solid #edebe9;
+        
+        &:hover {
+          background-color: #f8f7f6;
+        }
+        
+        td {
+          padding: 12px 16px;
+          color: #323130;
+          font-size: 14px;
+        }
+      }
+      
+      .invalidRow {
+        background-color: #fde7e9;
+        opacity: 0.7;
+        
+        &:hover {
+          background-color: #fdd;
+        }
+      }
+    }
+  }
+
+  .infoSection {
+    padding: 12px 16px;
+    background-color: #f8f7f6;
+    border-radius: 4px;
+    
+    .info {
+      color: #605e5c;
+      font-size: 13px;
+      
+      strong {
+        color: #323130;
+      }
+    }
+  }
+
+  .primaryButton {
+    padding: 10px 24px;
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    
+    &:hover {
+      background-color: #106ebe;
+    }
+    
+    &:active {
+      background-color: #005a9e;
+    }
+    
+    &:disabled {
+      background-color: #a19f9d;
+      cursor: not-allowed;
+    }
+  }
+
+  .secondaryButton {
+    padding: 6px 12px;
+    background-color: white;
+    color: #323130;
+    border: 1px solid #d2d0ce;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    
+    &:hover {
+      background-color: #f3f2f1;
+      border-color: #c7c5c4;
+    }
+  }
+
+  // Modal styles
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    
+    .modalOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    
+    .modalContent {
+      position: relative;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 1001;
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.2s ease-in-out;
+      
+      .modalHeader {
+        padding: 20px 24px;
+        border-bottom: 1px solid #edebe9;
+        
+        h3 {
+          margin: 0;
+          color: #323130;
+          font-size: 20px;
+          font-weight: 600;
+        }
+      }
+      
+      .modalBody {
+        padding: 24px;
+        color: #323130;
+        font-size: 14px;
+        line-height: 1.6;
+        
+        p {
+          margin: 0 0 12px 0;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+        
+        ul {
+          margin: 12px 0;
+          padding-left: 24px;
+          
+          li {
+            margin-bottom: 8px;
+          }
+        }
+        
+        .modalWarning {
+          background-color: #fff4ce;
+          border: 1px solid #ffb900;
+          border-radius: 4px;
+          padding: 12px;
+          margin: 16px 0;
+          color: #8a6d3b;
+        }
+      }
+      
+      .modalFooter {
+        padding: 16px 24px;
+        border-top: 1px solid #edebe9;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        
+        .modalCancelButton {
+          padding: 8px 20px;
+          background-color: white;
+          color: #323130;
+          border: 1px solid #d2d0ce;
+          border-radius: 4px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          
+          &:hover {
+            background-color: #f3f2f1;
+            border-color: #c7c5c4;
+          }
+        }
+        
+        .modalProceedButton {
+          padding: 8px 20px;
+          background-color: #d13438;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          
+          &:hover {
+            background-color: #a4262c;
+          }
+          
+          &:active {
+            background-color: #8b1e21;
+          }
+        }
+      }
+    }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

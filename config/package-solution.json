@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "riskpercentre-client-side-solution",
+    "id": "e613434b-74c3-4898-93f3-0f913ae52255",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "riskpercentre description"
+      },
+      "longDescription": {
+        "default": "riskpercentre description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "riskpercentre Feature",
+        "description": "The feature that activates elements of the riskpercentre solution.",
+        "id": "839c080b-5001-47a7-bb04-b0e226bd15b6",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/riskpercentre.sppkg"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "20.19.2",
+    "sdksVersions": {},
+    "version": "1.21.0",
+    "libraryName": "riskpercentre",
+    "libraryId": "e613434b-74c3-4898-93f3-0f913ae52255",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "riskpercentre",
+    "solutionShortDescription": "riskpercentre description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
