@@ -225,7 +225,7 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
     const confirmed = confirm(message);
 
     if (confirmed) {
-      this.processSelectedFiles().catch((error: any) => {
+      this.processSelectedFiles().catch((error: Error) => {
         console.error('[RiskCentre] Error in processSelectedFiles:', error);
       });
     }
@@ -292,9 +292,10 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       this.toggleSpinner(false);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('[RiskCentre] Error loading files:', error);
-      this.showError(`Failed to load files: ${error.message || 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.showError(`Failed to load files: ${errorMessage}`);
       this.toggleSpinner(false);
     }
   }
@@ -333,13 +334,14 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
         throw new Error('Summary file header row is empty');
       }
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('[RiskCentre] Error loading expected headers:', error);
-      throw new Error(`Cannot load summary file: ${error.message || 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Cannot load summary file: ${errorMessage}`);
     }
   }
 
-  private async validateFile(file: any): Promise<IExcelFileInfo> {
+  private async validateFile(file: {Name: string; ServerRelativeUrl: string}): Promise<IExcelFileInfo> {
     const fileInfo: IExcelFileInfo = {
       name: file.Name,
       url: file.ServerRelativeUrl,
@@ -393,9 +395,10 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       fileInfo.headerMatch = true;
 
-    } catch (error: any) {
+    } catch (error) {
       console.error(`[RiskCentre] Error validating file ${file.Name}:`, error);
-      fileInfo.errorMessage = error.message || 'Validation error';
+      const errorMessage = error instanceof Error ? error.message : 'Validation error';
+      fileInfo.errorMessage = errorMessage;
     }
 
     return fileInfo;
@@ -577,9 +580,10 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       console.log('[RiskCentre] Processing completed successfully');
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('[RiskCentre] Error processing files:', error);
-      this.showError(`Failed to process files: ${error.message || 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.showError(`Failed to process files: ${errorMessage}`);
       this.toggleSpinner(false);
     }
   }
