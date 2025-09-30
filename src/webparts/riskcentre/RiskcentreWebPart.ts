@@ -82,6 +82,14 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
             </div>
           </div>
 
+          <div style="background-color: #f8f7f6; border: 1px solid #edebe9; border-radius: 4px; padding: 12px 16px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #323130;">
+              <input type="checkbox" id="preserveHiddenRows" checked style="width: 18px; height: 18px; cursor: pointer;" />
+              <span style="font-weight: 600;">Preserve Hidden Rows</span>
+              <span style="color: #605e5c; font-weight: normal;">- Keep hidden rows hidden in the summary file</span>
+            </label>
+          </div>
+
           <table id="fileTable" class="${styles.fileTable}">
             <thead>
               <tr>
@@ -100,7 +108,7 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
           <div class="${styles.infoSection}">
             <div class="${styles.info}">
-              <strong>Note:</strong> Selected files will be combined into ${this.SUMMARY_FILE_NAME}. 
+              <strong>Note:</strong> Selected files will be combined into ${this.SUMMARY_FILE_NAME} in alphabetical order. 
               Existing data will be cleared (header row preserved).
             </div>
           </div>
@@ -134,7 +142,7 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
   }
 
   private toggleAllCheckboxes(checked: boolean): void {
-    const checkboxes = this.domElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+    const checkboxes = this.domElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"][data-file-index]');
     checkboxes.forEach(cb => {
       // Only toggle enabled checkboxes (valid files)
       if (!cb.disabled) {
@@ -186,6 +194,11 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
     }
   }
 
+  private getPreserveHiddenRowsOption(): boolean {
+    const checkbox = this.domElement.querySelector('#preserveHiddenRows') as HTMLInputElement;
+    return checkbox ? checkbox.checked : false;
+  }
+
   private showConfirmDialog(): void {
     const selectedFiles = this.getSelectedFiles();
 
@@ -194,13 +207,17 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
       return;
     }
 
+    const preserveHidden = this.getPreserveHiddenRowsOption();
+
     const message = 
       `⚠️ CONFIRM DATA PROCESSING\n\n` +
       `You are about to process ${selectedFiles.length} file(s).\n\n` +
       `This action will:\n` +
       `• Clear all existing data from ${this.SUMMARY_FILE_NAME}\n` +
       `• Keep the header row intact\n` +
-      `• Add data from the selected files\n\n` +
+      `• Add data from the selected files in alphabetical order\n` +
+      (preserveHidden ? `• Preserve hidden rows (keep them hidden)\n` : `• Copy hidden rows as visible\n`) +
+      `\n` +
       `⚠️ WARNING: Existing data will be permanently deleted.\n` +
       `This action cannot be undone.\n\n` +
       `Do you want to continue?`;
@@ -256,6 +273,8 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       // Sort files alphabetically by name
       this.excelFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+      console.log('[RiskCentre] Files sorted alphabetically');
 
       // Render table
       this.renderFileTable();
@@ -425,12 +444,18 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
   }
 
   private getSelectedFiles(): IExcelFileInfo[] {
-    const checkboxes = this.domElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked');
+    const checkboxes = this.domElement.querySelectorAll<HTMLInputElement>('input[type="checkbox"][data-file-index]:checked');
     const selectedIndexes = Array.from(checkboxes)
       .map(cb => parseInt(cb.getAttribute('data-file-index') || '-1'))
       .filter(index => index >= 0);
 
-    return this.excelFiles.filter((_, index) => selectedIndexes.includes(index));
+    // Get selected files and sort them alphabetically to maintain order
+    const selectedFiles = this.excelFiles.filter((_, index) => selectedIndexes.includes(index));
+    
+    // Sort selected files alphabetically by name
+    selectedFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+    return selectedFiles;
   }
 
   private async processSelectedFiles(): Promise<void> {
@@ -441,11 +466,15 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
       return;
     }
 
+    // Get preserve hidden rows option
+    const preserveHiddenRows = this.getPreserveHiddenRowsOption();
+
     this.toggleSpinner(true, `Processing ${selectedFiles.length} file(s)...`);
     this.hideMessages();
 
     try {
-      console.log('[RiskCentre] Processing files:', selectedFiles.length);
+      console.log('[RiskCentre] Processing files in alphabetical order:', selectedFiles.map(f => f.name));
+      console.log('[RiskCentre] Preserve hidden rows:', preserveHiddenRows);
 
       // Load summary file
       const summaryBuffer = await this.sp.web
@@ -471,14 +500,16 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       console.log('[RiskCentre] Data cleared, header preserved');
 
-      // Process each selected file
+      // Process each selected file in alphabetical order
       let totalRowsAdded = 0;
+      let hiddenRowsCount = 0;
+
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         
         this.toggleSpinner(true, `Processing file ${i + 1}/${selectedFiles.length}: ${file.name}...`);
         
-        console.log(`[RiskCentre] Processing: ${file.name}`);
+        console.log(`[RiskCentre] Processing [${i + 1}/${selectedFiles.length}]: ${file.name}`);
 
         // Load source file
         const sourceBuffer = await this.sp.web
@@ -507,6 +538,12 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
               newRow.height = sourceRow.height;
             }
 
+            // Copy row hidden state (only if option is enabled)
+            if (preserveHiddenRows && sourceRow.hidden === true) {
+              newRow.hidden = true;
+              hiddenRowsCount++;
+            }
+
             rowsFromFile++;
             totalRowsAdded++;
           }
@@ -517,7 +554,7 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       // Save summary file
       this.toggleSpinner(true, 'Saving summary file...');
-      console.log('[RiskCentre] Saving summary file with', totalRowsAdded, 'total rows');
+      console.log('[RiskCentre] Saving summary file with', totalRowsAdded, 'total rows in alphabetical order');
 
       const summaryBufferNew = await summaryWorkbook.xlsx.writeBuffer();
 
@@ -527,11 +564,16 @@ export default class RiskcentreWebPart extends BaseClientSideWebPart<IRiskcentre
 
       this.toggleSpinner(false);
 
-      alert(
+      let successMessage = 
         `✅ Success!\n\n` +
-        `Processed ${selectedFiles.length} file(s)\n` +
-        `Added ${totalRowsAdded} data rows to ${this.SUMMARY_FILE_NAME}`
-      );
+        `Processed ${selectedFiles.length} file(s) in alphabetical order\n` +
+        `Added ${totalRowsAdded} data rows to ${this.SUMMARY_FILE_NAME}`;
+
+      if (preserveHiddenRows && hiddenRowsCount > 0) {
+        successMessage += `\n(including ${hiddenRowsCount} hidden rows)`;
+      }
+
+      alert(successMessage);
 
       console.log('[RiskCentre] Processing completed successfully');
 
